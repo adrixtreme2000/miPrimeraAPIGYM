@@ -1,0 +1,28 @@
+version: '3'
+services:
+  mariadb:
+    image: mariadb
+    container_name: mariadb
+    restart: always
+    environment:
+      MARIADB_ROOT_PASSWORD: example
+      MARIADB_USER: agente
+      MARIADB_USER_PASSWORD: 0traClave
+      MARIADB_DATABASE: PEPS
+    # command: bash -c "mkdir -p /docker-entrypoint-initdb.d/"
+    volumes:
+      - ./mariadb_data:/var/lib/mysql
+    #  - ./:/docker-entrypoint-intidb.d/:rw
+    ports:
+      - 3307:3306
+    
+  phpmyadmin:
+    image: phpmyadmin
+    container_name: phpmyadmin
+    restart: always
+    environment:
+      - PMA_HOST=mariadb
+    ports:
+      - 9093:80
+    depends_on:
+      - mariadb

@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Gimnasio</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.2/css/bulma.min.css">
+    <style>
+        body {
+            background: #f5f5f5;
+        }
+        .navbar {
+            background: #ffdd57;
+            border-bottom: 2px solid #ffbe0b;
+        }
+        .hero {
+            background: linear-gradient(to right, #ffbe0b, #ff9e00);
+            color: white;
+        }
+        .hero-title {
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+        }
+        table {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        th {
+            background: #ffbe0b;
+            color: white;
+        }
+        .button {
+            font-weight: bold;
+        }
+        .is-success {
+            background: #36c04c;
+            color: white;
+        }
+        .is-info {
+            background: #209cee;
+        }
+        .is-danger {
+            background: #ff3860;
+        }
+    </style>
+    <script>
+        onload = function () {
+            pedirGimnasio();
+        }
+        function pintarGimnasio(lista) {
+            let tbody = document.getElementsByTagName("tbody")[0];
+            tbody.innerHTML = "";
+            lista.forEach(gimnasio => {
+                tbody.innerHTML += `<tr>
+                        <td><img src="${gimnasio.foto}" width="70" class="image is-64x64 is-rounded"></td>
+                        <td>${gimnasio.nombre}</td>
+                        <td>${gimnasio.descripcion}</td>
+                        <td>${gimnasio.precio} €</td>
+                        <td>
+                            <a href="/editar_gimnasio.html?id=${gimnasio.id}" class="button is-info">Editar</a>
+                        </td>
+                        <td>
+                            <button class="button is-danger" onclick="eliminarGimnasio(${gimnasio.id})">Eliminar</button>
+                        </td>
+                </tr>`;
+            });
+        }
+        function pedirGimnasio() {
+            fetch("/api/gimnasio", { method: 'GET' })
+                .then(response => response.json())
+                .then(result => {
+                    if (result.status) {
+                        location.href = "gimnasio.html";
+                    } else {
+                        pintarGimnasio(result);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert("Ha habido un error al recuperar los gimnasios. Refresque la página.");
+                });
+        }
+        function eliminarGimnasio(id) {
+            fetch(`/api/gimnasio/${id}`, { method: 'DELETE' })
+                .then(response => response.json())
+                .then(result => {
+                    if (result.status == "OK") {
+                        alert("Gimnasio eliminado");
+                        pedirGimnasio();
+                    } else {
+                        alert("El gimnasio no ha podido ser eliminado.");
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert("Se ha producido un error y el gimnasio no ha podido ser eliminado.");
+                });
+        }
+        function cerrarSesion() {
+            fetch("/api/logout", { method: 'GET' })
+                .then(response => response.json())
+                .then(result => {
+                    if (result.status == "OK") {
+                        location.href = "/index.html";
+                    } else {
+                        alert("No se ha podido cerrar sesión.");
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert("Se ha producido un error y no se ha podido cerrar sesión.");
+                });
+        }
+    </script>
+</head>
+<body>
+    <nav class="navbar" role="navigation" aria-label="main navigation">
+        <div class="navbar-brand">
+            <button class="navbar-burger button" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+            </button>
+        </div>
+        <div class="navbar-menu">
+            <div class="navbar-start">
+                <a class="navbar-item" href="/gimnasio.html">Inicio</a>
+                <a class="navbar-item" href="/subida.html">Archivos</a>
+                <a class="navbar-item" href="javascript:cerrarSesion()">Cerrar sesión</a>
+            </div>
+        </div>
+    </nav>
+
+    <section class="hero is-medium is-bold">
+        <div class="hero-body">
+            <div class="container">
+                <h1 class="title hero-title">Bienvenido a la Gestión de Gimnasios</h1>
+                <h2 class="subtitle">Administra cuotas y datos de manera sencilla</h2>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            <div class="columns is-centered">
+                <div class="column is-10">
+                    <h3 class="is-size-4 has-text-weight-bold">Gimnasio</h3>
+                    <a href="/agregar_gimnasio.html" class="button is-success mb-4">Agregar cuota</a>
+                    <table class="table is-fullwidth is-hoverable">
+                        <thead>
+                            <tr>
+                                <th>Imagen</th>
+                                <th>Nombre</th>
+                                <th>Descripción</th>
+                                <th>Precio</th>
+                                <th>Editar</th>
+                                <th>Eliminar</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+</body>
+</html>

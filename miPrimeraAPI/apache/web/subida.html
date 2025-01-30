@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Archivos</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.2/css/bulma.min.css">
+    <script>
+        var myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+
+        function enviarArchivo() {
+            const nombre = document.getElementById("nombre").value.trim();
+            const fichero = document.getElementById("fichero").files[0];
+
+            if (!nombre || !fichero) {
+                alert("Por favor, rellena el nombre y selecciona un archivo.");
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('fichero', fichero);
+            formData.append('nombre', nombre);
+
+            fetch("/api/upload", {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.status === "OK") {
+                    alert("Archivo subido correctamente");
+                    location.href = "gimnasio.html";
+                } else {
+                    alert("El archivo no ha podido subirse");
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert("Ha ocurrido un error al subir el archivo. Inténtalo de nuevo.");
+            });
+        }
+
+        function verArchivo() {
+            const nombreArchivo = document.getElementById("nombreArchivo").value.trim();
+
+            if (!nombreArchivo) {
+                alert("Por favor, introduce el nombre del archivo.");
+                return;
+            }
+
+            fetch(`/ver/${nombreArchivo}`, { method: 'GET' })
+            .then(response => response.json())
+            .then(result => {
+                if (result.status === "OK") {
+                    document.getElementById("contenidoArchivo").value = result.contenido;
+                } else {
+                    document.getElementById("contenidoArchivo").value = "El contenido no está disponible.";
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert("Ha ocurrido un error al recuperar el archivo. Inténtalo de nuevo.");
+            });
+        }
+    </script>
+</head>
+<body>
+    <section class="section">
+        <div class="container">
+            <h1 class="title">Gestión de Archivos</h1>
+
+            <!-- Subir Archivo -->
+            <div class="box">
+                <h2 class="subtitle">Subir un archivo</h2>
+                <div class="field">
+                    <label class="label">Nombre del archivo</label>
+                    <div class="control">
+                        <input type="text" class="input" id="nombre" placeholder="Introduce el nombre del archivo">
+                    </div>
+                </div>
+                <div class="field">
+                    <label class="label">Seleccionar archivo</label>
+                    <div class="control">
+                        <input type="file" class="input" id="fichero">
+                    </div>
+                </div>
+                <div class="control">
+                    <button class="button is-primary" onclick="enviarArchivo()">Subir archivo</button>
+                </div>
+            </div>
+
+            <!-- Ver Archivo -->
+            <div class="box">
+                <h2 class="subtitle">Ver contenido de un archivo</h2>
+                <div class="field">
+                    <label class="label">Nombre del archivo</label>
+                    <div class="control">
+                        <input type="text" class="input" id="nombreArchivo" placeholder="Introduce el nombre del archivo a buscar">
+                    </div>
+                </div>
+                <div class="control">
+                    <button class="button is-link" onclick="verArchivo()">Ver contenido</button>
+                </div>
+                <div class="field mt-4">
+                    <label class="label">Contenido del archivo</label>
+                    <div class="control">
+                        <textarea id="contenidoArchivo" class="textarea" placeholder="Aquí aparecerá el contenido del archivo..." readonly></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</body>
+</html>

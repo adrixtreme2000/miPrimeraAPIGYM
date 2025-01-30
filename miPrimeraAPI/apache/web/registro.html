@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro - Gimnasio</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.2/css/bulma.min.css">
+    <style>
+        body {
+            background: linear-gradient(to bottom, #ffdd57, #f8a617);
+            font-family: 'Arial', sans-serif;
+        }
+        .container {
+            max-width: 400px;
+            margin: 50px auto;
+            background: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #f5a623;
+            font-size: 28px;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        label {
+            font-weight: bold;
+            color: #444;
+        }
+        .error {
+            display: none;
+            color: red;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+        .button {
+            width: 100%;
+            margin-top: 10px;
+            border-radius: 8px;
+        }
+    </style>
+    <script>
+        var myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+
+        function conectar() {
+            document.getElementsByClassName("error")[0].style.display = "none";
+            var raw = JSON.stringify({
+                "username": document.getElementById("username").value,
+                "password": document.getElementById("password").value,
+                "profile": document.getElementById("profile").value
+            });
+
+            var requestOptions = {
+                method: 'POST',
+                headers: myHeaders,
+                body: raw
+            };
+
+            fetch("/api/registro", requestOptions)
+                .then(response => response.json())
+                .then(result => {
+                    if (result.status == "OK") {
+                        alert("Usuario registrado correctamente");
+                        location.href = "/index.html";
+                    } else {
+                        document.getElementsByClassName("error")[0].style.display = "block";
+                    }
+                })
+                .catch(error => console.log('error', error));
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Registro</h1>
+        <form>
+            <div class="field">
+                <label for="username">Usuario</label>
+                <input type="text" id="username" class="input" placeholder="Introduce tu usuario">
+            </div>
+            <div class="field">
+                <label for="password">Clave</label>
+                <input type="password" id="password" class="input" placeholder="Introduce tu clave">
+            </div>
+            <div class="field">
+                <label for="profile">Perfil</label>
+                <input type="text" id="profile" class="input" value="normal" disabled>
+            </div>
+            <p class="error">Usuario ya existe</p>
+            <button type="button" class="button is-success" onclick="conectar()">Registrarse</button>
+        </form>
+    </div>
+</body>
+</html>

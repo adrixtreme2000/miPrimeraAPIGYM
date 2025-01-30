@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Gimnasio</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.2/css/bulma.min.css">
+    <script>
+        var myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+        var queryString = window.location.search;
+        var urlParams = new URLSearchParams(queryString);
+        var id = urlParams.get('id');
+
+        window.onload = function() {
+            obtenerDatosGimnasio(id);
+        }
+
+        function obtenerDatosGimnasio(id) {
+            fetch("/api/gimnasio/" + id, { method: 'GET' })
+                .then(response => response.json())
+                .then(result => pintarGimnasio(result))
+                .catch(error => {
+                    console.log('error', error);
+                    alert("No se pudo cargar la información del gimnasio.");
+                    location.href = "gimnasio.html";
+                });
+        }
+
+        function pintarGimnasio(gimnasio) {
+            document.getElementById("nombre").value = gimnasio.nombre;
+            document.getElementById("descripcion").value = gimnasio.descripcion;
+            document.getElementById("precio").value = gimnasio.precio;
+            document.getElementById("foto").value = gimnasio.foto;
+        }
+
+        function guardar() {
+            let nombre = document.getElementById("nombre").value;
+            let descripcion = document.getElementById("descripcion").value;
+            let precio = document.getElementById("precio").value;
+            let foto = document.getElementById("foto").value;
+            let datos = JSON.stringify({
+                "id": id,
+                "nombre": nombre,
+                "descripcion": descripcion,
+                "precio": precio,
+                "foto": foto
+            });
+
+            var requestOptions = {
+                method: 'PUT',
+                headers: myHeaders,
+                body: datos
+            };
+
+            fetch("/api/gimnasio", requestOptions)
+                .then(response => response.json())
+                .then(result => {
+                    if (result.status == "OK") {
+                        alert("Gimnasio modificado correctamente.");
+                        location.href = "gimnasio.html";
+                    } else {
+                        alert("No se pudo modificar el gimnasio.");
+                    }
+                })
+                .catch(error => {
+                    console.log('error', error);
+                    alert("Ocurrió un error al modificar el gimnasio.");
+                });
+        }
+    </script>
+</head>
+<body>
+    <nav class="navbar is-warning">
+        <div class="navbar-brand">
+            <a class="navbar-item" href="/gimnasio.html">Inicio</a>
+        </div>
+    </nav>
+
+    <section class="section">
+        <div class="container">
+            <h1 class="title">Editar Gimnasio</h1>
+            <div class="field">
+                <label class="label" for="nombre">Nombre</label>
+                <div class="control">
+                    <input required type="text" id="nombre" class="input" placeholder="Nombre del gimnasio">
+                </div>
+            </div>
+            <div class="field">
+                <label class="label" for="descripcion">Descripción</label>
+                <div class="control">
+                    <input required type="text" id="descripcion" class="input" placeholder="Descripción del gimnasio">
+                </div>
+            </div>
+            <div class="field">
+                <label class="label" for="precio">Precio</label>
+                <div class="control">
+                    <input required type="number" id="precio" class="input" placeholder="Precio del gimnasio">
+                </div>
+            </div>
+            <div class="field">
+                <label class="label" for="foto">Foto (URL)</label>
+                <div class="control">
+                    <input required type="text" id="foto" class="input" placeholder="URL de la foto del gimnasio">
+                </div>
+            </div>
+            <div class="buttons">
+                <button onclick="guardar()" class="button is-success">Guardar</button>
+                <a href="/gimnasio.html" class="button is-light">Volver</a>
+            </div>
+        </div>
+    </section>
+</body>
+</html>
