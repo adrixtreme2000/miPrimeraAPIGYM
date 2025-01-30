@@ -12,3 +12,5 @@ si se desea arrancar los contenedores de BBDD sólo y lanzar la aplicación pyth
   Ejecuta: pip install -r requirements.txt   (instala los paquetes necesarios)
   Ejecuta: python app.py
   Probar la aplicación con: localhost:7777/
+
+** Si da problemas: dar permisos sudo chown $USER:$USER * y sudo chmod 777 * a /apache/web y /mariadb **
